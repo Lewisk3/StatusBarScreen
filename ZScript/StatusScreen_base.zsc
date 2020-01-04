@@ -7,22 +7,22 @@ class StatusBarScreen Abstract ui
 	{
 		SS_SCREEN_CENTER		= 0x1,
 		SS_SCREEN_TOP_CENTER	= 0x2,
-		SS_SCREEN_BOTTOM_CENTER = 0x4,
+		SS_SCREEN_BOTTOM_CENTER	= 0x4,
 		SS_SCREEN_TOP_LEFT		= 0x8,
 		SS_SCREEN_BOTTOM_LEFT	= 0x10,
 		SS_SCREEN_TOP_RIGHT		= 0x20,
 		SS_SCREEN_BOTTOM_RIGHT	= 0x40,
-		SS_COORDS_TEXGRID       = 0x80
+		SS_COORDS_TEXGRID		= 0x80
 	};
 
 	static vector2 _ProcessCoords(vector2 pos, uint flags)
 	{
-		vector2 center 	  	  = (statscr_base_width/2., statscr_base_height/2.);
-		vector2 top_center 	  = (statscr_base_width/2., 0);
-		vector2 bottom_center = (statscr_base_width/2., statscr_base_height);
-		vector2 top_right 	  = (statscr_base_width, 0);
-		vector2 bottom_right  = (statscr_base_width, statscr_base_height);
-		vector2 bottom_left   = (0, statscr_base_height);
+		vector2 center			= (statscr_base_width/2., statscr_base_height/2.);
+		vector2 top_center		= (statscr_base_width/2., 0);
+		vector2 bottom_center	= (statscr_base_width/2., statscr_base_height);
+		vector2 top_right		= (statscr_base_width, 0);
+		vector2 bottom_right	= (statscr_base_width, statscr_base_height);
+		vector2 bottom_left		= (0, statscr_base_height);
 			
 		if(flags & SS_SCREEN_CENTER       ) return center		+pos;
 		if(flags & SS_SCREEN_TOP_CENTER   ) return top_center	+pos;

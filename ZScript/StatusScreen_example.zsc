@@ -4,5 +4,6 @@ class StatusScreen_RenderEVH : EventHandler
 	{
 		StatusBarScreen.DrawString("bigfont","Test!\nLine Two!", (75,250));
 		StatusBarScreen.DrawImage("ICON",(0,-0.5), StatusBarScreen.SS_COORDS_TEXGRID|StatusBarScreen.SS_SCREEN_BOTTOM_CENTER);
+		StatusBarScreen.Fill(Color(255,0,0,255),100,100,300,300);
 	}
 }

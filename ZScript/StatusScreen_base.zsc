@@ -48,7 +48,7 @@ class StatusBarScreen Abstract ui
 		
 		return _ProcessCoords(pos, flags);
 	}
-
+	
 	static void DrawTexture(TextureID texture, Vector2 pos, int flags = 0, double Alpha = 1., Vector2 scale = (1, 1))
 	{
 		vector2 texsize;
@@ -94,15 +94,27 @@ class StatusBarScreen Abstract ui
 	static void Fill(Color col, double x, double y, double w, double h, int flags = 0)
 	{
 		vector2 pos = (x, y);
-		float sc_xres = statscr_base_width/Screen.getWidth();
-		float sc_yres = statscr_base_height/Screen.getHeight();		
+		float sc_xres = Screen.getWidth()/statscr_base_width;
+		float sc_yres = Screen.getHeight()/statscr_base_height;		
 		vector2 npos = _ProcessCoords(pos, flags);
-		pos.x *= sc_xres;
-		pos.y *= sc_yres;
+		npos.x *= sc_xres;
+		npos.y *= sc_yres;
 		w *= sc_xres;
 		h *= sc_yres;
 		
 		Screen.Dim(col, 1.0, npos.x, npos.y, w, h);
 	}
 	
+	static void SetClipRect(int x, int y, int w, int h)
+	{
+		float sc_xres = Screen.getWidth()/statscr_base_width;
+		float sc_yres = Screen.getHeight()/statscr_base_height;		
+		x *= sc_xres;
+		y *= sc_yres;
+		w *= sc_xres;
+		h *= sc_yres;
+		Screen.SetClipRect(x,y,w,h);
+	}
+	
+	static void ClearClipRect() { Screen.ClearClipRect(); }
 }	

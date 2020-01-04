@@ -53,24 +53,24 @@ class StatusBarScreen Abstract ui
 	{
 		vector2 texsize;
 		[texsize.x, texsize.y] = TexMan.GetSize(texture);
-		
+
 		vector2 npos = _ProcessTextureCoords(pos, flags, texture);
-		
+
 		Screen.DrawTexture(texture, false, npos.x, npos.y,
-            DTA_VirtualWidthF, statscr_base_width,
-            DTA_VirtualHeightF, statscr_base_height,
-            DTA_KeepRatio, true,
-            DTA_Alpha, alpha,
-            DTA_DestWidth, int(texsize.x*scale.x),
-            DTA_DestHeight, int(texsize.y*scale.y)
-        );
+			DTA_VirtualWidthF, statscr_base_width,
+			DTA_VirtualHeightF, statscr_base_height,
+			DTA_KeepRatio, true,
+			DTA_Alpha, alpha,
+			DTA_DestWidth, int(texsize.x*scale.x),
+			DTA_DestHeight, int(texsize.y*scale.y)
+		);
 	}
 
 	static void DrawImage(String graphic, Vector2 pos, int flags = 0, double Alpha = 1., Vector2 scale = (1, 1))
-    {
-        TextureID texture = TexMan.CheckForTexture(graphic, TexMan.Type_Any);
+	{
+		TextureID texture = TexMan.CheckForTexture(graphic, TexMan.Type_Any);
 		DrawTexture(texture, pos, flags, alpha, scale);
-    }
+	}
 	
 	static void DrawString(Font fnt, String str, Vector2 pos, int flags = 0, int translation = Font.CR_UNTRANSLATED, double Alpha = 1., Vector2 scale = (1, 1), int linespacing = 20)
 	{

@@ -1,9 +1,97 @@
 class StatusScreen_RenderEVH : EventHandler
 {
+	ui float hpcounter;
+	float hit_fade;
+	float twolf_hue;
+
+	override void WorldThingDamaged(WorldEvent e)
+	{
+		// Turn on hitmarker if an enemy is damaged
+		if(e.Thing && e.Thing.bISMONSTER) hit_fade = 1.0;
+	}
+	
+	override void WorldTick()
+	{
+		// Handles hitmarker alpha and timberwolf RGB cycle.
+		if(hit_fade > 0) hit_fade *= 0.85;
+		
+		twolf_hue += 0.01;
+		if(twolf_hue > 2.0) twolf_hue = 0;
+	}
+
 	override void RenderOverlay(RenderEvent e)
 	{
-		StatusBarScreen.DrawString("bigfont","Test!\nLine Two!", (75,250));
-		StatusBarScreen.DrawImage("ICON",(0,-0.5), StatusBarScreen.SS_COORDS_TEXGRID|StatusBarScreen.SS_SCREEN_BOTTOM_CENTER);
-		StatusBarScreen.Fill(Color(255,0,0,255),100,100,300,300);
+		// Draw simple elements
+		// The SS_COORDS_TEXGRID flag multiplies the X/Y coords by the image size.
+		// Images are drawn relative to their center, not their upperleft most pixel
+		StatusBarScreen.DrawImage("Radar",(0.5,0.60), StatusBarScreen.SS_COORDS_TEXGRID);
+		StatusBarScreen.DrawImage("HITMARK", (16,16), StatusBarScreen.SS_SCREEN_CENTER, hit_fade, scale:(1.2,1.2) );
+		
+		// Draw timberwolf
+		StatusBarScreen.DrawImage ( 
+				"ICON", (0,-0.5),
+				StatusBarScreen.SS_COORDS_TEXGRID | StatusBarScreen.SS_SCREEN_BOTTOM_CENTER,
+				tint:StatusColor.HSLToRGB(twolf_hue, 1.0, 0.5)
+		);
+		
+		// Draw Radar around Camera (player)
+		vector2 rpos = StatusBarScreen.GetImageSize("Radar");
+		DrawRadar(e.Camera, (rpos.x*0.5, rpos.y*0.6) );
+	}
+	
+	ui void DrawRadar(Actor mid, vector2 radarpos)
+	{
+		if(!mid) return;
+		float scale = 7;
+		ThinkerIterator act_it = ThinkerIterator.Create("Actor");
+		Actor obj;
+							
+		while(obj = Actor(act_it.Next()))
+		{
+			// Simple Radar Display
+			// Find actors with-in 135*scale units, rotate their coords around the player.
+			int x = mid.pos.x - obj.pos.x;
+			int y = mid.pos.y - obj.pos.y;
+			int dis = ceil(mid.Distance3D(obj)/scale);
+			if( dis < 135 )
+			{
+				float frontangle = mid.angle+180;
+				int dx = ( y * cos((frontangle) )) - ( x * sin((frontangle)) );
+				int dy = ( y * sin((frontangle) )) + ( x * cos((frontangle)) );
+				dx /= scale;
+				dy /= scale;
+				if( obj != mid && obj.target && obj.bSOLID && obj.bSHOOTABLE )
+					StatusBarScreen.DrawImage("ENEMYIND",(radarpos.x-dx,radarpos.y-dy));
+			}
+		}
+	}
+	
+	override void RenderUnderlay(RenderEvent e)
+	{
+		let plr = e.Camera;
+		if(plr)
+		{
+			// Interpolate health counter.
+			if(hpcounter != plr.health) hpcounter = (0.95 * hpcounter) + (0.05 * plr.health);
+			
+			// Draw a bar whose length depends on the players health.
+			float hpratio = (float(hpcounter)/plr.Spawnhealth());
+			StatusBarScreen.Fill (
+				Color(255,255-int(hpratio*255),0,255*int(hpratio*255)),
+				1920-(1920*hpratio),0,
+				1920,25
+			);
+			
+			// Color for drawing the healthbar, 0.28 is used here because a hue of 0.28 is bright green.
+			// It's really useful when wanting to fade to red as 0 hue is red.
+			// We're passing an alpha of 0.4 here because 1.0 will tint the font too heavily, removing detail.
+			Color hpcolor = StatusColor.HSLtoRGB(0.28*hpratio,1.0,0.5, 0.4);
+			StatusBarScreen.DrawString ( 
+					"bigfont",
+					String.Format("Health %d%%",ceil(hpratio*100)), (-75,0), 
+					StatusBarScreen.SS_SCREEN_TOP_CENTER, Font.CR_WHITE, 
+					tint:hpcolor
+			);
+		}
 	}
 }

@@ -63,10 +63,14 @@ class StatusBarScreen Abstract ui
 		return pos;
 	}
 
-	static vector2 _ProcessTextureCoords(vector2 pos, uint flags, TextureID texture)
+	static vector2 _ProcessTextureCoords(vector2 pos, uint flags, TextureID texture, vector2 scale=(1,1))
 	{
 		vector2 texsize;
 		[texsize.x, texsize.y] = TexMan.GetSize(texture);
+		
+		// Ugh, why can't i just multiply 2 vec2's together?
+		texsize.x *= scale.x;
+		texsize.y *= scale.y;
 		
 		if(flags & SS_COORDS_TEXGRID)
 		{
@@ -84,7 +88,7 @@ class StatusBarScreen Abstract ui
 		vector2 texsize;
 		[texsize.x, texsize.y] = TexMan.GetSize(texture);
 
-		vector2 npos = _ProcessTextureCoords(pos, flags, texture);
+		vector2 npos = _ProcessTextureCoords(pos, flags, texture, scale);
 
 		Screen.DrawTexture(texture, false, npos.x, npos.y,
 			DTA_VirtualWidthF, statscr_base_width,

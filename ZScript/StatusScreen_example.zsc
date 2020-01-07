@@ -24,8 +24,18 @@ class StatusScreen_RenderEVH : EventHandler
 		// Draw simple elements
 		// The SS_COORDS_TEXGRID flag multiplies the X/Y coords by the image size.
 		// Images are drawn relative to their center, not their upperleft most pixel
-		StatusBarScreen.DrawImage("Radar",(0.5,0.60), StatusBarScreen.SS_COORDS_TEXGRID);
-		StatusBarScreen.DrawImage("HITMARK", (16,16), StatusBarScreen.SS_SCREEN_CENTER, hit_fade, scale:(1.2,1.2) );
+		StatusBarScreen.DrawImage("Radar",(0.6,0.60), StatusBarScreen.SS_COORDS_TEXGRID);
+		
+		// Draw hitmarker
+		StatusBarScreen.DrawImage (	
+			"HITMARK", 
+			(0,0), 
+			StatusBarScreen.SS_COORDS_TEXGRID | StatusBarScreen.SS_SCREEN_CENTER, 
+			hit_fade, scale:(1.2,1.2) 
+		);
+		
+		// Draw mugshot
+		StatusBarScreen.DrawMugshot(5,(0.5,-1.25),StatusBarScreen.SS_COORDS_TEXGRID | StatusBarScreen.SS_SCREEN_BOTTOM_LEFT);
 		
 		// Draw timberwolf
 		StatusBarScreen.DrawImage ( 

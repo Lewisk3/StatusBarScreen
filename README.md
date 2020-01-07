@@ -2,8 +2,9 @@
 GZDoom StatusBar functionality under the Screen API.
 
 # Functions
-## DrawTexture
+###### DrawTexture
 ```
+	**Takes**
 	TextureID texture, 
 	Vector2 pos, 
 	int flags = 0, 
@@ -11,10 +12,12 @@ GZDoom StatusBar functionality under the Screen API.
 	Vector2 scale = (1, 1), 
 	Color tint=Color(0,0,0,0)
 	
-	@returns void
+	**Returns**
+	void
 ```
-## DrawImage
+###### DrawImage
 ```
+	**Takes**
 	String graphic, 
 	Vector2 pos, 
 	int flags = 0, 
@@ -22,10 +25,12 @@ GZDoom StatusBar functionality under the Screen API.
 	Vector2 scale = (1, 1), 
 	Color tint=Color(0,0,0,0)
 	
-	@returns void
+	**Returns**
+	void
 ```
-## DrawMugshot
+###### DrawMugshot
 ```
+	**Takes**
 	int accuracy, 
 	vector2 pos, 
 	int drawflags = 0, 
@@ -33,15 +38,21 @@ GZDoom StatusBar functionality under the Screen API.
 	float alpha = 1.0, 
 	vector2 scale=(5.0,5.0), 
 	string default_face="STF"
-	@returns void
+	
+	**Returns**
+	void
 ```
-## GetImageSize
+###### GetImageSize
 ```
+	**Takes**
 	String graphic
-	@returns vector2
+	
+	**Returns**
+	vector2
 ```
-## DrawString
+###### DrawString
 ```
+	**Takes**
 	Font fnt, 
 	String str,
 	Vector2 pos, 
@@ -51,27 +62,36 @@ GZDoom StatusBar functionality under the Screen API.
 	Vector2 scale = (1, 1), 
 	Color tint = Color(0,0,0,0), 
 	int linespacing = 20
-	@returns void
+	
+	**Returns**
+	void
 ```
-## Fill
+###### Fill
 ```
+	**Takes**
 	Color col, 
 	double x, 
 	double y,
 	double w, 
 	double h, 
 	int flags = 0
-	@returns void
+	
+	**Returns**
+	void
 ```
-## SetClipRect
+###### SetClipRect
 ```
+	**Takes**
 	int x, 
 	int y, 
 	int w, 
 	int h
-	@returns void
+	
+	**Returns**
+	void
 ```
-## ClearClipRect()
+###### ClearClipRect()
 ```
-	@returns void
+	**Returns**
+	void
 ```

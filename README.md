@@ -2,7 +2,7 @@
 GZDoom StatusBar functionality under the Screen API.
 
 # Functions
-** DrawTexture
+## DrawTexture
 ```
 	TextureID texture, 
 	Vector2 pos, 
@@ -13,7 +13,7 @@ GZDoom StatusBar functionality under the Screen API.
 	
 	@returns void
 ```
-** DrawImage
+## DrawImage
 ```
 	String graphic, 
 	Vector2 pos, 
@@ -24,7 +24,7 @@ GZDoom StatusBar functionality under the Screen API.
 	
 	@returns void
 ```
-** DrawMugshot
+## DrawMugshot
 ```
 	int accuracy, 
 	vector2 pos, 
@@ -35,12 +35,12 @@ GZDoom StatusBar functionality under the Screen API.
 	string default_face="STF"
 	@returns void
 ```
-** GetImageSize
+## GetImageSize
 ```
 	String graphic
 	@returns vector2
 ```
-** DrawString
+## DrawString
 ```
 	Font fnt, 
 	String str,
@@ -53,7 +53,7 @@ GZDoom StatusBar functionality under the Screen API.
 	int linespacing = 20
 	@returns void
 ```
-** Fill
+## Fill
 ```
 	Color col, 
 	double x, 
@@ -63,7 +63,7 @@ GZDoom StatusBar functionality under the Screen API.
 	int flags = 0
 	@returns void
 ```
-** SetClipRect
+## SetClipRect
 ```
 	int x, 
 	int y, 
@@ -71,7 +71,7 @@ GZDoom StatusBar functionality under the Screen API.
 	int h
 	@returns void
 ```
-** ClearClipRect()
+## ClearClipRect()
 ```
 	@returns void
 ```

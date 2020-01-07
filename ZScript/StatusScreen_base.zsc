@@ -111,7 +111,7 @@ class StatusBarScreen Abstract ui
 							 float alpha = 1.0, vector2 scale=(5.0,5.0), string default_face="STF"			)
 	{
 		TextureID mugtex = statusbar.GetMugshot(accuracy, mugshotflags, default_face);
-		DrawTexture(mugtex, pos, drawflags, 1.0, scale);
+		DrawTexture(mugtex, pos, drawflags, alpha, scale);
 	}
 	
 	static vector2 GetImageSize(String graphic)

@@ -45,15 +45,38 @@ class StatusBarScreen Abstract ui
 		SS_COORDS_TEXGRID		= 0x80
 	};
 
+	static float GetBaseHeight()
+	{
+		return statscr_base_height;
+	}
+	
+	static float GetBaseWidth()
+	{
+		return statscr_base_width;
+	}
+	
+	// Determines the true bottom of viewspace, 
+	// gets its ratio to the desired resolution.
+	static float GetStatusBarHeightRatio()
+	{	
+		int widthOfs, heightOfs, width, height;
+		[widthOfs, heightOfs, width, height] = Screen.GetViewWindow();
+
+		int bottom = heightOfs + height;
+		return float(bottom) / Screen.getHeight();
+	}
+
+	// Coord processing
 	static vector2 _ProcessCoords(vector2 pos, uint flags)
 	{
-		vector2 center			= (statscr_base_width/2., statscr_base_height/2.);
-		vector2 top_center		= (statscr_base_width/2., 0);
-		vector2 bottom_center	= (statscr_base_width/2., statscr_base_height);
-		vector2 top_right		= (statscr_base_width, 0);
-		vector2 bottom_right	= (statscr_base_width, statscr_base_height);
-		vector2 bottom_left		= (0, statscr_base_height);
-			
+		float centery = (GetBaseHeight()*GetStatusBarHeightRatio())/2.;
+		vector2 center			= (GetBaseWidth()/2., centery);
+		vector2 top_center		= (GetBaseWidth()/2., 0);
+		vector2 bottom_center	= (GetBaseWidth()/2., GetBaseHeight());
+		vector2 top_right		= (GetBaseWidth(), 0);
+		vector2 bottom_right	= (GetBaseWidth(), GetBaseHeight());
+		vector2 bottom_left		= (0, GetBaseHeight());
+		
 		if(flags & SS_SCREEN_CENTER       ) return center		+pos;
 		if(flags & SS_SCREEN_TOP_CENTER   ) return top_center	+pos;
 		if(flags & SS_SCREEN_BOTTOM_CENTER) return bottom_center+pos;
@@ -63,7 +86,7 @@ class StatusBarScreen Abstract ui
 		return pos;
 	}
 
-	static vector2 _ProcessTextureCoords(vector2 pos, uint flags, TextureID texture, vector2 scale=(1,1))
+	static vector2 _ProcessTextureCoords(vector2 pos, vector2 texoffs, uint flags, TextureID texture, vector2 scale=(1,1))
 	{
 		vector2 texsize;
 		[texsize.x, texsize.y] = TexMan.GetSize(texture);
@@ -77,41 +100,61 @@ class StatusBarScreen Abstract ui
 			pos.x = pos.x*texsize.x;
 			pos.y = pos.y*texsize.y;
 		}
-		pos.x -= texsize.x/2.;
-		pos.y -= texsize.y/2.;
+		pos.x -= (texsize.x*texoffs.x)/2.;
+		pos.y -= (texsize.y*texoffs.y*GetStatusBarHeightRatio())/2.;
 		
 		return _ProcessCoords(pos, flags);
 	}
 	
-	static void DrawTexture(TextureID texture, Vector2 pos, int flags = 0, double Alpha = 1., Vector2 scale = (1, 1), Color tint=Color(0,0,0,0))
+	static void DrawTexture(TextureID texture, Vector2 pos, int flags = 0, double Alpha = 1., Vector2 scale = (1, 1), Color tint=Color(0,0,0,0), vector2 texoffs = (1,1), bool absolute=false)
 	{
 		vector2 texsize;
 		[texsize.x, texsize.y] = TexMan.GetSize(texture);
 
-		vector2 npos = _ProcessTextureCoords(pos, flags, texture, scale);
 
-		Screen.DrawTexture(texture, false, npos.x, npos.y,
-			DTA_VirtualWidthF, statscr_base_width,
-			DTA_VirtualHeightF, statscr_base_height,
-			DTA_KeepRatio, true,
-			DTA_Alpha, alpha,
-			DTA_DestWidth, int(texsize.x*scale.x),
-			DTA_DestHeight, int(texsize.y*scale.y),
-			DTA_ColorOverlay, tint
-		);
+		if(!absolute)
+		{
+			vector2 npos = _ProcessTextureCoords(pos, texoffs, flags, texture, scale);
+			Screen.DrawTexture(texture, false, npos.x, npos.y,
+				DTA_VirtualWidthF, GetBaseWidth(),
+				DTA_VirtualHeightF, GetBaseHeight(),
+				DTA_KeepRatio, true,
+				DTA_Alpha, alpha,
+				DTA_DestWidth, int(texsize.x*scale.x),
+				DTA_DestHeight, int(texsize.y*scale.y),
+				DTA_ColorOverlay, tint
+			);
+		}
+		else
+		{
+			vector2 resolution = (Screen.GetWidth(), Screen.GetHeight());
+			vector2 scaleratio = (resolution.x/GetBaseWidth(), resolution.y/GetBaseHeight());
+			vector2 nscale = (scale.x*scaleratio.x, scale.y*scaleratio.y);
+			pos.y *= GetStatusBarHeightRatio();
+			vector2 npos = _ProcessTextureCoords(pos, texoffs, flags, texture, nscale);
+			
+			Screen.DrawTexture(texture, false, npos.x, npos.y,
+				DTA_KeepRatio, true,
+				DTA_Alpha, alpha,
+				DTA_DestWidth, int(texsize.x*scale.x*scaleratio.x),
+				DTA_DestHeight, int(texsize.y*scale.y*scaleratio.y),
+				DTA_ColorOverlay, tint
+			);
+		}
 	}
 
-	static void DrawImage(String graphic, Vector2 pos, int flags = 0, double Alpha = 1., Vector2 scale = (1, 1), Color tint=Color(0,0,0,0))
+	static void DrawImage(String graphic, Vector2 pos, int flags = 0, double Alpha = 1., Vector2 scale = (1, 1), Color tint=Color(0,0,0,0), vector2 texoffs = (1,1), bool absolute=false)
 	{
 		TextureID texture = TexMan.CheckForTexture(graphic, TexMan.Type_Any);
-		DrawTexture(texture, pos, flags, alpha, scale, tint);
+		DrawTexture(texture, pos, flags, alpha, scale, tint, texoffs, absolute);
 	}
 	
 	static void DrawMugshot( int accuracy, vector2 pos, int drawflags = 0, int mugshotflags = 0, 
-							 float alpha = 1.0, vector2 scale=(5.0,5.0), string default_face="STF"			)
+							 float alpha = 1.0, vector2 scale=(5.0,5.0), string default_face="STF",
+							 Color tint=Color(0,0,0,0), bool absolute=false  )
 	{
 		TextureID mugtex = statusbar.GetMugshot(accuracy, mugshotflags, default_face);
-		DrawTexture(mugtex, pos, drawflags, alpha, scale);
+		DrawTexture(mugtex, pos, drawflags, alpha, scale, tint, (1,1), absolute);
 	}
 	
 	static vector2 GetImageSize(String graphic)
@@ -137,8 +180,8 @@ class StatusBarScreen Abstract ui
 			 float lineoffs = (linespacing*i);
 			 Screen.DrawText(fnt, translation, npos.x, npos.y+lineoffs, 
 				lines[i],
-				DTA_VirtualWidthF,  int(statscr_base_width*(1./scale.x*0.5)),
-				DTA_VirtualHeightF, int(statscr_base_height*(1./scale.y*0.5)),
+				DTA_VirtualWidthF,  int(GetBaseWidth()*(1./scale.x*0.5)),
+				DTA_VirtualHeightF, int(GetBaseHeight()*(1./scale.y*0.5)),
 				DTA_KeepRatio, true,
 				DTA_Alpha, alpha,
 				DTA_ColorOverlay, tint
@@ -146,14 +189,17 @@ class StatusBarScreen Abstract ui
 		}		
 	}
 	
-	static void Fill(Color col, double x, double y, double w, double h, int flags = 0)
+	static void Fill(Color col, double x, double y, double w, double h, int flags = 0, bool absolute = false)
 	{
 		vector2 pos = (x, y);
-		float sc_xres = Screen.getWidth()/statscr_base_width;
-		float sc_yres = Screen.getHeight()/statscr_base_height;		
-		vector2 npos = _ProcessCoords(pos, flags);
-		npos.x *= sc_xres;
-		npos.y *= sc_yres;
+		float sc_xres = Screen.getWidth()/GetBaseWidth();
+		float sc_yres = Screen.getHeight()/GetBaseHeight();		
+		vector2 npos = absolute ? pos : _ProcessCoords(pos, flags);
+		if(!absolute)
+		{
+			npos.x *= sc_xres;
+			npos.y *= sc_yres;
+		}
 		w *= sc_xres;
 		h *= sc_yres;
 		
@@ -162,8 +208,8 @@ class StatusBarScreen Abstract ui
 	
 	static void SetClipRect(int x, int y, int w, int h)
 	{
-		float sc_xres = Screen.getWidth()/statscr_base_width;
-		float sc_yres = Screen.getHeight()/statscr_base_height;		
+		float sc_xres = Screen.getWidth()/GetBaseWidth();
+		float sc_yres = Screen.getHeight()/GetBaseHeight();		
 		x *= sc_xres;
 		y *= sc_yres;
 		w *= sc_xres;

@@ -1,5 +1,6 @@
 class StatusScreen_RenderEVH : EventHandler
 {
+	Actor aim_enemy;
 	ui float hpcounter;
 	float hit_fade;
 	float twolf_hue;
@@ -12,6 +13,10 @@ class StatusScreen_RenderEVH : EventHandler
 	
 	override void WorldTick()
 	{
+		// Get target under aim.
+		let plr = players[consoleplayer].mo;
+		if(plr) aim_enemy = plr.AimTarget();
+		
 		// Handles hitmarker alpha and timberwolf RGB cycle.
 		if(hit_fade > 0) hit_fade *= 0.85;
 		
@@ -30,7 +35,7 @@ class StatusScreen_RenderEVH : EventHandler
 		StatusBarScreen.DrawImage (	
 			"HITMARK", 
 			(0,0), 
-			StatusBarScreen.SS_COORDS_TEXGRID | StatusBarScreen.SS_SCREEN_CENTER, 
+			StatusBarScreen.SS_COORDS_TEXGRID | StatusBarScreen.SS_SCREEN_CENTER,
 			hit_fade, scale:(1.2,1.2) 
 		);
 		
@@ -47,6 +52,48 @@ class StatusScreen_RenderEVH : EventHandler
 		// Draw Radar around Camera (player)
 		vector2 rpos = StatusBarScreen.GetImageSize("Radar");
 		DrawRadar(e.Camera, (rpos.x*0.5, rpos.y*0.6) );
+		
+		// Draw HUD projections
+		if(aim_enemy)
+		{
+			bool infront;
+			string pstr = aim_enemy.GetClassName();
+			ViewProjection viewproj = StatusBarScreen.GetRenderEventViewProj(e);
+			
+			vector2 apos, bpos, cpos, dpos;
+			
+			[infront, apos] = StatusBarScreen.GetActorHUDPos (
+				viewproj,
+				aim_enemy, aim_enemy.radius, 0, aim_enemy.height
+			);	
+			[infront, bpos] = StatusBarScreen.GetActorHUDPos (
+				viewproj,
+				aim_enemy, -aim_enemy.radius, 0, aim_enemy.height
+			);	
+			[infront, cpos] = StatusBarScreen.GetActorHUDPos (
+				viewproj,
+				aim_enemy, aim_enemy.radius, 0, 0
+			);	
+			[infront, dpos] = StatusBarScreen.GetActorHUDPos (
+				viewproj,
+				aim_enemy, -aim_enemy.radius, 0, 0
+			);	
+			
+			if(infront) 
+			{
+				StatusBarScreen.DrawImage("RETCA0", apos, scale:(1.0,1.0), texoffs:(0,1), absolute:true);
+				StatusBarScreen.DrawImage("RETCB0", bpos, scale:(1.0,1.0), absolute:true);
+				StatusBarScreen.DrawImage("RETCC0", cpos, scale:(1.0,1.0), texoffs:(0,1), absolute:true);
+				StatusBarScreen.DrawImage("RETCD0", dpos, scale:(1.0,1.0), absolute:true);
+			}
+		}
+	}
+	
+	clearscope float NormalizeAngle(float ang)
+	{
+		while(ang > 360) ang -= 360;
+		while(ang < 0) ang += 360;
+		return ang;
 	}
 	
 	ui void DrawRadar(Actor mid, vector2 radarpos)

@@ -57,7 +57,6 @@ class StatusScreen_RenderEVH : EventHandler
 		if(aim_enemy)
 		{
 			bool infront;
-			string pstr = aim_enemy.GetClassName();
 			ViewProjection viewproj = StatusBarScreen.GetRenderEventViewProj(e);
 			
 			vector2 apos, bpos, cpos, dpos;

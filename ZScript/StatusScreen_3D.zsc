@@ -183,4 +183,34 @@ extend class StatusBarScreen
 
 		return front, finalpos;
 	}
+	
+		
+	static void DrawString3D( Font fnt, String str, Vector2 pos, int flags = 0, int translation = Font.CR_UNTRANSLATED, 
+							double Alpha = 1., Vector2 scale = (1, 1), Color tint = Color(0,0,0,0), int linespacing = 20, 
+							float distance=0 )
+	{
+		Array<String> lines;
+		str.Split(lines, "\n");
+			
+		scale /= distance/300.0;
+	
+		vector2 resolution = (Screen.GetWidth(), Screen.GetHeight());
+		vector2 scaleratio = (resolution.x/GetBaseWidth(), resolution.y/GetBaseHeight());
+		vector2 nscale = (scale.x*scaleratio.x, scale.y*scaleratio.y);
+		pos.y *= GetStatusBarHeightRatio();
+		vector2 npos = _ProcessCoords(pos, flags);
+		
+		for(int i = 0; i < lines.Size(); i++)
+		{
+			 float lineoffs = (linespacing*i);
+			 Screen.DrawText(fnt, translation, npos.x/nscale.x, (npos.y/nscale.y)+lineoffs, 
+				lines[i],
+				DTA_KeepRatio, true,
+				DTA_Alpha, alpha,
+				DTA_VirtualWidth, int(resolution.x/nscale.x),
+				DTA_VirtualHeight,int(resolution.y/nscale.y),
+				DTA_ColorOverlay, tint
+			);
+		}		
+	}
 }

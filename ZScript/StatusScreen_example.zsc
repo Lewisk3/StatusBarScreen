@@ -85,6 +85,14 @@ class StatusScreen_RenderEVH : EventHandler
 				StatusBarScreen.DrawImage("RETCB0", bpos, scale:(1.0,1.0), absolute:true);
 				StatusBarScreen.DrawImage("RETCC0", cpos, scale:(1.0,1.0), texoffs:(0,1), absolute:true);
 				StatusBarScreen.DrawImage("RETCD0", dpos, scale:(1.0,1.0), absolute:true);
+				
+				StatusBarScreen.DrawString3D("smallfont", 
+					aim_enemy.GetClassName(), 
+					apos, 0, 
+					Font.CR_GRAY, 
+					scale:(1.5,1.5),
+					distance: e.Camera.Distance2D(aim_enemy)
+				);
 			}
 		}
 	}

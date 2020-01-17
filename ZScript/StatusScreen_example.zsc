@@ -97,13 +97,6 @@ class StatusScreen_RenderEVH : EventHandler
 		}
 	}
 	
-	clearscope float NormalizeAngle(float ang)
-	{
-		while(ang > 360) ang -= 360;
-		while(ang < 0) ang += 360;
-		return ang;
-	}
-	
 	ui void DrawRadar(Actor mid, vector2 radarpos)
 	{
 		if(!mid) return;

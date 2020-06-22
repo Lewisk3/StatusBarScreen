@@ -1,7 +1,9 @@
 class StatusScreen_RenderEVH : EventHandler
 {
 	Actor aim_enemy;
-	ui float hpcounter;
+	ui double hpcounter;
+	double rotation;
+	double scaleflip;
 	float hit_fade;
 	float twolf_hue;
 
@@ -21,6 +23,9 @@ class StatusScreen_RenderEVH : EventHandler
 		if(hit_fade > 0) hit_fade *= 0.85;
 		
 		twolf_hue += 0.01;
+		rotation += 1;
+		scaleflip -= 0.02;
+		if(scaleflip < -1) scaleflip = 1.0;
 		if(twolf_hue > 2.0) twolf_hue = 0;
 	}
 
@@ -43,8 +48,8 @@ class StatusScreen_RenderEVH : EventHandler
 		StatusBarScreen.DrawMugshot(5,(0.5,-1.25),StatusBarScreen.SS_COORDS_TEXGRID | StatusBarScreen.SS_SCREEN_BOTTOM_LEFT);
 		
 		// Draw timberwolf
-		StatusBarScreen.DrawImage ( 
-				"ICON", (0,-0.5),
+		StatusBarScreen.DrawRotatedImage (
+				"ICON", (0,-0.5), rotation, (1.0*scaleflip, 1.0), 1.0,
 				StatusBarScreen.SS_COORDS_TEXGRID | StatusBarScreen.SS_SCREEN_BOTTOM_CENTER,
 				tint:StatusColor.HSLToRGB(twolf_hue, 1.0, 0.5)
 		);
@@ -57,7 +62,7 @@ class StatusScreen_RenderEVH : EventHandler
 		if(aim_enemy)
 		{
 			bool infront;
-			ViewProjection viewproj = StatusBarScreen.GetRenderEventViewProj(e);
+			ViewProjection viewproj = StatusBarScreen.GetActorViewProj(e.Camera);
 			
 			vector2 apos, bpos, cpos, dpos;
 			

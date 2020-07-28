@@ -51,6 +51,7 @@ class StatusScreen_RenderEVH : EventHandler
 		StatusBarScreen.DrawRotatedImage (
 				"ICON", (0,-0.5), rotation, (1.0*scaleflip, 1.0), 1.0,
 				StatusBarScreen.SS_COORDS_TEXGRID | StatusBarScreen.SS_SCREEN_BOTTOM_CENTER,
+				(32 + (32*(rotation/180)), 64 - (32*(rotation/180)) ), 
 				tint:StatusColor.HSLToRGB(twolf_hue, 1.0, 0.5)
 		);
 		

@@ -100,16 +100,21 @@ class StatusBarScreen Abstract ui
 			pos.x = pos.x*texsize.x;
 			pos.y = pos.y*texsize.y;
 		}
+		
+		texoffs.x -= 1.0;
+		texoffs.y -= 1.0;
 		pos.x -= (texsize.x*texoffs.x)/2.;
 		pos.y -= (texsize.y*texoffs.y*GetStatusBarHeightRatio())/2.;
 		
 		return _ProcessCoords(pos, flags);
 	}
 	
-	static void DrawTexture(TextureID texture, Vector2 pos, int flags = 0, double Alpha = 1., Vector2 scale = (1, 1), Color tint=Color(0,0,0,0), vector2 texoffs = (1,1), bool absolute=false)
+	static void DrawTexture(TextureID texture, Vector2 pos, int flags = 0, double Alpha = 1., Vector2 scale = (1, 1), double rotation = 0, Color tint=Color(0,0,0,0), vector2 texoffs = (1,1), vector2 rotoffs = (1,1), bool absolute=false)
 	{
 		vector2 texsize;
 		[texsize.x, texsize.y] = TexMan.GetSize(texture);
+		rotoffs.x *= texsize.x / 2.;
+		rotoffs.y *= texsize.y / 2.;
 
 		if(!absolute)
 		{
@@ -122,7 +127,11 @@ class StatusBarScreen Abstract ui
 				DTA_DestWidth, int(texsize.x*abs(scale.x)),
 				DTA_DestHeight, int(texsize.y*abs(scale.y)),
 				DTA_FlipX, !!(scale.x < 0),
-				DTA_ColorOverlay, tint
+				DTA_ColorOverlay, tint,
+				DTA_Rotate, rotation,
+				DTA_CenterOffsetRel, true,
+				DTA_TopOffset, int(rotoffs.y),
+				DTA_LeftOffset, int(rotoffs.x)
 			);
 		}
 		else
@@ -139,23 +148,27 @@ class StatusBarScreen Abstract ui
 				DTA_DestWidth, int(texsize.x*abs(scale.x)*scaleratio.x),
 				DTA_DestHeight, int(texsize.y*abs(scale.y)*scaleratio.y),
 				DTA_FlipX, !!(scale.x < 0),
-				DTA_ColorOverlay, tint
+				DTA_ColorOverlay, tint,
+				DTA_Rotate, rotation,
+				DTA_CenterOffsetRel, true,
+				DTA_TopOffset, int(rotoffs.y),
+				DTA_LeftOffset, int(rotoffs.x)
 			);
 		}
 	}
 
-	static void DrawImage(String graphic, Vector2 pos, int flags = 0, double Alpha = 1., Vector2 scale = (1, 1), Color tint=Color(0,0,0,0), vector2 texoffs = (1,1), bool absolute=false)
+	static void DrawImage(String graphic, Vector2 pos, int flags = 0, double Alpha = 1., Vector2 scale = (1, 1), double rotation = 0, Color tint=Color(0,0,0,0), vector2 texoffs = (1,1), vector2 rotoffs = (1,1), bool absolute=false)
 	{
 		TextureID texture = TexMan.CheckForTexture(graphic, TexMan.Type_Any);
-		DrawTexture(texture, pos, flags, alpha, scale, tint, texoffs, absolute);
+		DrawTexture(texture, pos, flags, alpha, scale, rotation, tint, texoffs, rotoffs, absolute);
 	}
 	
 	static void DrawMugshot( int accuracy, vector2 pos, int drawflags = 0, int mugshotflags = 0, 
-							 double alpha = 1.0, vector2 scale=(5.0,5.0), string default_face="STF",
+							 double alpha = 1.0, vector2 scale=(5.0,5.0), double rotation = 0, string default_face="STF",
 							 Color tint=Color(0,0,0,0), bool absolute=false)
 	{
 		TextureID mugtex = statusbar.GetMugshot(accuracy, mugshotflags, default_face);
-		DrawTexture(mugtex, pos, drawflags, alpha, scale, tint, (1,1), absolute);
+		DrawTexture(mugtex, pos, drawflags, alpha, scale, rotation, tint, (1,1), (1,1), absolute);
 	}
 	
 	static vector2 GetImageSize(String graphic)
@@ -245,17 +258,17 @@ class StatusBarScreen Abstract ui
 			for(int i = 0; i < 4; i++) Clip[i] += border;
 
 			//Draw the whole foreground
-			DrawTexture(ontex, position, 0, alpha, scale, tint, (0,0) );
+			DrawTexture(ontex, position, 0, alpha, scale, 0, tint, (0,0) );
 			SetClipRect(position.X + Clip[0], position.Y + Clip[1], on_texsize.X - Clip[0] - Clip[2], on_texsize.Y - Clip[1] - Clip[3]);
 		}
 		
-		if (offtex.IsValid() && off_texsize == on_texsize) DrawTexture(offtex, position, 0, alpha, scale, tint, (0,0) );
+		if (offtex.IsValid() && off_texsize == on_texsize) DrawTexture(offtex, position, 0, alpha, scale, 0, tint, (0,0) );
 		else Fill(color(255,0,0,0), position.X + Clip[0], position.Y + Clip[1], on_texsize.X - Clip[0] - Clip[2], on_texsize.Y - Clip[1] - Clip[3]);
 		
 		if (border == 0) 
 		{
 			SetClipRect(position.X + Clip[0], position.Y + Clip[1], on_texsize.X - Clip[0] - Clip[2], on_texsize.Y - Clip[1] - Clip[3]);
-			DrawTexture(ontex, position, 0, alpha, scale, tint, (0,0) );
+			DrawTexture(ontex, position, 0, alpha, scale, 0, tint, (0,0) );
 		}
 		// restore the previous clipping rectangle
 		screen.SetClipRect(cx, cy, cw, ch);
@@ -284,67 +297,5 @@ class StatusBarScreen Abstract ui
 		);
 	}
 
-	static void DrawRotatedImage(String graphic, vector2 pos, double rotation = 0, Vector2 scale = (1, 1), double Alpha = 1., int flags = 0, vector2 texoffs = (0,0), Color tint=Color(0,0,0,0), bool animated = false, bool absolute=false)
-	{
-		TextureID texture = TexMan.CheckForTexture(graphic, TexMan.Type_Any);		
-		vector2 texsize;
-		[texsize.x, texsize.y] = TexMan.GetSize(texture);
-		vector2 resolution = (Screen.GetWidth(), Screen.GetHeight());
-		vector2 scaleratio = (resolution.x/GetBaseWidth(), resolution.y/GetBaseHeight());
-		vector2 nscale = (scale.x*scaleratio.x, scale.y*scaleratio.x);
-		
-		pos.y *= GetStatusBarHeightRatio();
-		vector2 npos = _ProcessTextureCoords(pos, (0,0), flags, texture, nscale);
-		npos.x *= scaleratio.x;
-		npos.y *= scaleratio.y;
-		
-		Shape2D surface = MakeSquare();
-		MoveSquare(surface, (nscale.x*texsize.x,nscale.y*texsize.y), npos, rotation, texoffs);
-		
-		DrawShape(texture, surface, animated, alpha, tint);
-	}
-	
-	// -- Credits: Marisa Kirisame - //
-	static clearscope Shape2D MakeSquare()
-	{
-		// the shape that will be drawn
-		Shape2D square = new("Shape2D");
-		// texture coordinates of each corner
-		square.PushCoord((0,0));
-		square.PushCoord((1,0));
-		square.PushCoord((0,1));
-		square.PushCoord((1,1));
-		// two triangles make up the square
-		// the points have to be in counter-clockwise order
-		square.PushTriangle(0,3,1);
-		square.PushTriangle(0,2,3);
-		return square;
-	}
-
-	// set the positions of an existing square shape's vertices
-	static clearscope void MoveSquare( Shape2D shape, Vector2 size, Vector2 pos, double angle, vector2 centerpos = (0,0) )
-	{
-		// clear any vertices already set
-		shape.Clear(Shape2D.C_Verts);
-		// corners of a square centered on 0,0
-		Vector2 points[4];
-		points[0] = (-0.5*size.x,-0.5*size.y);
-		points[1] = ( 0.5*size.x,-0.5*size.y);
-		points[2] = (-0.5*size.x, 0.5*size.y);
-		points[3] = ( 0.5*size.x, 0.5*size.y);
-		for ( int i=0; i<4; i++ )
-		{
-			Vector2 oldpos = points[i];
-			vector2 origin = ( 
-				centerpos.x*cos(angle)-centerpos.y*sin(angle),
-				centerpos.x*sin(angle)+centerpos.y*cos(angle)
-			);
-			points[i].x = origin.x+(oldpos.x*cos(angle)-oldpos.y*sin(angle)) + pos.x;
-			points[i].y = origin.y+(oldpos.x*sin(angle)+oldpos.y*cos(angle)) + pos.y;
-			shape.PushVertex(points[i]);
-		}
-	}
-	// ---- //
-	
 	static void ClearClipRect() { Screen.ClearClipRect(); }
 }	

@@ -45,16 +45,18 @@ class StatusScreen_RenderEVH : EventHandler
 		);
 		
 		// Draw mugshot
-		StatusBarScreen.DrawMugshot(5,(0.5,-1.25),StatusBarScreen.SS_COORDS_TEXGRID | StatusBarScreen.SS_SCREEN_BOTTOM_LEFT);
+		StatusBarScreen.DrawMugshot(5,(0.75,-1.25),StatusBarScreen.SS_COORDS_TEXGRID | StatusBarScreen.SS_SCREEN_BOTTOM_LEFT);
 		
 		// Draw timberwolf
-		StatusBarScreen.DrawRotatedImage (
-				"ICON", (0,-0.5), rotation, (1.0*scaleflip, 1.0), 1.0,
+		StatusBarScreen.DrawImage (
+				"ICON", (0,-0.5), 
 				StatusBarScreen.SS_COORDS_TEXGRID | StatusBarScreen.SS_SCREEN_BOTTOM_CENTER,
-				(32 + (32*(rotation/180)), 64 - (32*(rotation/180)) ), 
-				tint:StatusColor.HSLToRGB(twolf_hue, 1.0, 0.5)
+				scale:(1.0*scaleflip, 1.0), e.Camera.angle-90,
+				tint:StatusColor.HSLToRGB(twolf_hue, 1.0, 0.5),
+				texoffs:(1.0,1.0),
+				rotoffs:(1.0,1.0)
 		);
-		
+				
 		// Draw Radar around Camera (player)
 		vector2 rpos = StatusBarScreen.GetImageSize("Radar");
 		DrawRadar(e.Camera, (rpos.x*0.5, rpos.y*0.6) );

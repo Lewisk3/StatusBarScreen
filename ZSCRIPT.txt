@@ -3,3 +3,4 @@ version 4.0
 #include "ZScript/StatusScreen_base.zsc"
 #include "ZScript/StatusScreen_example.zsc"
 #include "ZScript/StatusScreen_3D.zsc"
+#include "ZScript/StatusScreen_Shape2D.zsc"

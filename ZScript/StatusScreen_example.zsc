@@ -48,9 +48,10 @@ class StatusScreen_RenderEVH : EventHandler
 		StatusBarScreen.DrawMugshot(5,(0.75,-1.25),StatusBarScreen.SS_COORDS_TEXGRID | StatusBarScreen.SS_SCREEN_BOTTOM_LEFT);
 		
 		// Draw timberwolf
+		uint twolf_flags = StatusBarScreen.SS_COORDS_TEXGRID | StatusBarScreen.SS_SCREEN_BOTTOM_CENTER;
 		StatusBarScreen.DrawImage (
 				"ICON", (0,-0.5), 
-				StatusBarScreen.SS_COORDS_TEXGRID | StatusBarScreen.SS_SCREEN_BOTTOM_CENTER,
+				twolf_flags,
 				scale:(1.0*scaleflip, 1.0), e.Camera.angle-90,
 				tint:StatusColor.HSLToRGB(twolf_hue, 1.0, 0.5),
 				texoffs:(1.0,1.0),

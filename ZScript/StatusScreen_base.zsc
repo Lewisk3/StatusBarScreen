@@ -42,7 +42,8 @@ class StatusBarScreen Abstract ui
 		SS_SCREEN_BOTTOM_LEFT	= 0x10,
 		SS_SCREEN_TOP_RIGHT		= 0x20,
 		SS_SCREEN_BOTTOM_RIGHT	= 0x40,
-		SS_COORDS_TEXGRID		= 0x80
+		SS_COORDS_TEXGRID		= 0x80,
+		SS_NOASPECTCORRECTION   = 0x100
 	};
 
 	static double GetBaseHeight()
@@ -85,6 +86,17 @@ class StatusBarScreen Abstract ui
 		if(flags & SS_SCREEN_BOTTOM_RIGHT ) return bottom_right +pos;
 		return pos;
 	}
+	
+	static vector2 _ProcessScale(vector2 scale, uint flags)
+	{
+		if(!(flags & SS_NOASPECTCORRECTION)) 
+		{
+			double aspectdef = GetBaseWidth() / GetBaseHeight();
+			double aspectmod = Screen.GetAspectRatio() / aspectdef;
+			scale.x /= aspectmod;
+		}
+		return scale;
+	}
 
 	static vector2 _ProcessTextureCoords(vector2 pos, vector2 texoffs, uint flags, TextureID texture, vector2 scale=(1,1))
 	{
@@ -115,6 +127,7 @@ class StatusBarScreen Abstract ui
 		[texsize.x, texsize.y] = TexMan.GetSize(texture);
 		rotoffs.x *= texsize.x / 2.;
 		rotoffs.y *= texsize.y / 2.;
+		scale = _ProcessScale(scale, flags);
 
 		if(!absolute)
 		{
@@ -187,6 +200,7 @@ class StatusBarScreen Abstract ui
 		str.Split(lines, "\n");
 		
 		vector2 npos = _ProcessCoords(pos, flags);
+		scale = _ProcessScale(scale, flags);
 		npos.x *= (1./scale.x*0.5);
 		npos.y *= (1./scale.y*0.5);
 		

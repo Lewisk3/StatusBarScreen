@@ -194,7 +194,7 @@ class StatusBarScreen Abstract ui
 	}
 	
 	static void DrawString( Font fnt, String str, Vector2 pos, int flags = 0, int translation = Font.CR_UNTRANSLATED, 
-							double Alpha = 1., Vector2 scale = (1, 1), Color tint = Color(0,0,0,0), int linespacing = 20 )
+							double Alpha = 1., Vector2 scale = (1, 1), Color tint = Color(0,0,0,0), int charspacing = 0, int linespacing = 20 )
 	{
 		Array<String> lines;
 		str.Split(lines, "\n");
@@ -213,7 +213,8 @@ class StatusBarScreen Abstract ui
 				DTA_VirtualHeightF, int(GetBaseHeight()*(1./scale.y*0.5)),
 				DTA_KeepRatio, true,
 				DTA_Alpha, alpha,
-				DTA_ColorOverlay, tint
+				DTA_ColorOverlay, tint,
+				DTA_Spacing, charspacing
 			);
 		}		
 	}

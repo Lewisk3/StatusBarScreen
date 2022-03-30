@@ -34,7 +34,6 @@ class StatusScreen_RenderEVH : EventHandler
 		// Draw simple elements
 		// The SS_COORDS_TEXGRID flag multiplies the X/Y coords by the image size.
 		// Images are drawn relative to their center, not their upperleft most pixel
-		StatusBarScreen.DrawImage("Radar",(0.5,0.60), StatusBarScreen.SS_COORDS_TEXGRID);
 		
 		// Draw hitmarker
 		StatusBarScreen.DrawImage (	
@@ -60,7 +59,10 @@ class StatusScreen_RenderEVH : EventHandler
 				
 		// Draw Radar around Camera (player)
 		vector2 rpos = StatusBarScreen.GetImageSize("Radar");
-		DrawRadar(e.Camera, (rpos.x*0.5, rpos.y*0.6) );
+		rpos = (rpos.x*0.5, rpos.y*0.6);
+		StatusBarScreen.DrawImage("Radar", rpos);
+		DrawRadar(e.Camera, rpos);
+		
 		
 		// Draw HUD projections
 		if(aim_enemy)
